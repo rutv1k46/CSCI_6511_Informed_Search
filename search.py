@@ -33,6 +33,7 @@ class State:
     def __lt__(self, other):
         return self._state < other._state
 
+    # get next states
     def get_next_states(self, seen = set()):
         next_states = []
         states = get_next_states(self._state, self.capacities)
@@ -58,8 +59,9 @@ class InformedSearch:
 
     def __repr__(self):
         return f"<InformedSearch{self.solution_state or ''}>"
-        
-    def solution_possible(self, capacities, target):
+      
+    # check if the target is reachable 
+    def target_reachable(self, capacities, target):
         gcd = capacities[0]
         
         for i in range(1, len(capacities) -1):
@@ -74,7 +76,7 @@ class InformedSearch:
     
     def a_star_search(self, heuristic = None, target = None, check_admissible = True):
         # if no solution possible then return -1
-        if not self.solution_possible(self.capacities, self.target):
+        if not self.target_reachable(self.capacities, self.target):
             return -1
         
         # if target not specified
@@ -98,10 +100,11 @@ class InformedSearch:
                 self.solution_state = state
                 break
 
+            # calculate cost 
             self.calc_cost(heuristic, state, target, check_admissible)
             self.visited.add(state.state)
         
-        # check if heuristoc is admissible while still perofrming the search            
+        # check if heuristic is admissible while still performing the search            
         if solution != -1 and check_admissible:
             self.check_admissibility(self.solution_state, heuristic, solution)
             
@@ -131,17 +134,19 @@ class InformedSearch:
         closest_capacity_to_h = min(capacities[:-1], key = lambda x:abs(x-h))
         steps_to_repeat_state = pitcher_fills_to_repeat_state * 2 - 1
 
-        # only full pitcher poured into the infinite pitcher
+        # last full pitcher poured into the infinite pitcher
         if current_volumetric_potential == 0:
             return max(2*(h/closest_capacity_to_h), 2)
         
         return max(h/current_volumetric_potential * steps_to_repeat_state, 1)
             
     @classmethod
+    # parse capacities of the pitchers and the target from the file
     def from_file(cls, filename, heuristic = None):
         capacities, target = parse_file(filename)
         return cls(capacities = capacities, target = target, heuristic = heuristic)
 
+    # check if the heuristic is admissible 
     def check_admissibility(self, state, heuristic, solution):
         # inadmissible heuristic
         if heuristic(state.state, self.capacities, self.target) != 0:
@@ -155,6 +160,7 @@ class InformedSearch:
             # print("Heuristic seems admissible")
         return True
 
+    # calculate cost for the next states from a given state
     def calc_cost(self, heuristic, state, target, check_admissible):
         for st in state.get_next_states():
             if not st.state in self.visited:
