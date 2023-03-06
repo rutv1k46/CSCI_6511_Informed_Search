@@ -38,7 +38,6 @@ class FileTest(unittest.TestCase):
         s = InformedSearch.from_file('data/input2.txt', heuristic=InformedSearch.get_heuristic)
         s.print_problem()
         result = s.a_star_search()
-        s.print_problem()
         self.assertEqual(result, -1, "Should be no solution")
 
     def test_3(self):
@@ -66,5 +65,4 @@ class FileTest(unittest.TestCase):
         self.assertEqual(result, 19, "Should be 19")
     
 
-if __name__ == '__main__':
-    unittest.main()
+unittest.main()

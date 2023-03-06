@@ -185,10 +185,10 @@ def get_next_states(state: Tuple[int], capacities = Tuple[int]):
     next_states = []
     seen_next_states = {state}
     
-    for ix, bx in enumerate(state):
+    for ix, px in enumerate(state):
         
         # empty the pitcher
-        if bx != 0 or capacities[ix] is None:
+        if px != 0 or capacities[ix] is None:
             tmp_state = list(state)
             tmp_state[ix] = 0
             tmp_state = tuple(tmp_state)
@@ -197,7 +197,7 @@ def get_next_states(state: Tuple[int], capacities = Tuple[int]):
                 next_states.append(tmp_state)
     
         # fill the pitcher
-        if capacities[ix] is not None and bx < capacities[ix]:
+        if capacities[ix] is not None and px < capacities[ix]:
             tmp_state = list(state)
             tmp_state[ix] = capacities[ix]
             tmp_state = tuple(tmp_state)
@@ -206,27 +206,27 @@ def get_next_states(state: Tuple[int], capacities = Tuple[int]):
                 next_states.append(tmp_state)
     
         # skip the pitcher
-        if bx == 0:
+        if px == 0:
             continue
     
-        calc_pitcher_combos(state, capacities,  next_states, seen_next_states, ix, bx)
+        calc_pitcher_combos(state, capacities,  next_states, seen_next_states, ix, px)
     return next_states
 
 # generate states to pour from one pitcher to another
-def calc_pitcher_combos(state, capacities,  next_states, seen_next_states, ix, bx):
-    for iy, by in enumerate(state): 
+def calc_pitcher_combos(state, capacities,  next_states, seen_next_states, ix, px):
+    for iy, py in enumerate(state): 
         # dont pour from and to the same pitcher
         if ix == iy: 
             continue
     
         capacity_y = capacities[iy]
-        y_remaining = capacity_y - by if capacity_y is not None else bx 
+        y_remaining = capacity_y - py if capacity_y is not None else px 
         
-        # add upto the capacity for the by pitcher
-        delta = min(y_remaining, bx)
+        # add upto the capacity for the py pitcher
+        delta = min(y_remaining, px)
     
-        # pitcher y can take capaciyt_y - by from the bx pitcher
-        if capacity_y is None or by < capacity_y:
+        # pitcher y can take capaciyt_y - py from the px pitcher
+        if capacity_y is None or py < capacity_y:
             tmp_state = list(state)
             tmp_state[ix] = tmp_state[ix] - delta
             tmp_state[iy] = tmp_state[iy] + delta
